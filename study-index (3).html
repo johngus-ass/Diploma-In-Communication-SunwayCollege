@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #EDE8DC;
+    --paper-raised: #F6F2E8;
+    --ink: #24304A;
+    --ink-soft: #56607A;
+    --line: #D8D0BC;
+    --line-strong: #BEB49A;
+    --brass: #A9822F;
+    --brass-deep: #7A5D1F;
+    --done-bg: #E4EADB;
+    --done-ink: #445C31;
+
+    --c1: #7A5240;  --c1-bg: #EFE1D8;
+    --c2: #2E5A4A;  --c2-bg: #DEEAE3;
+    --c3: #3E5C82;  --c3-bg: #DEE6F0;
+    --c4: #7A3B4E;  --c4-bg: #F0DDE3;
+    --c5: #6B5A2E;  --c5-bg: #EBE3CB;
+    --c6: #4B4E7A;  --c6-bg: #E1E1F0;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Work Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app{
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  header.top{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 1.1rem;
+  }
+
+  header.top h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.9rem;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  header.top .tally{
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .layout{
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 0;
+    background: var(--paper-raised);
+    border: 1px solid var(--line-strong);
+  }
+
+  nav.tabs{
+    border-right: 1px solid var(--line-strong);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tab{
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    text-align: left;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+  .tab:last-child{ border-bottom: none; }
+
+  .tab .swatch{
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .tab .count{
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    opacity: 0.75;
+  }
+
+  .tab.active{
+    background: var(--paper);
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .tab.active::before{
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--tab-color, var(--brass));
+  }
+
+  main.panel{
+    padding: 1.75rem 2rem 2rem;
+    min-height: 420px;
+  }
+
+  .subject-head{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .subject-name-wrap{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .subject-name-wrap .swatch-lg{
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .subject-name{
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--ink);
+    padding: 2px 4px;
+  }
+
+  .progress-wrap{
+    text-align: right;
+    min-width: 130px;
+  }
+
+  .progress-label{
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+
+  .progress-track{
+    width: 130px;
+    height: 5px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .progress-fill{
+    height: 100%;
+    background: var(--brass);
+  }
+
+  .slides{
+    list-style: none;
+    margin: 0 0 1.3rem;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .slide-row{
+    padding: 0.75rem 0.15rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .slide-row-top{
+    display: grid;
+    grid-template-columns: 22px 1fr auto auto;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .slide-row.done .slide-row-top{ opacity: 0.62; }
+
+  .preview-wrap{
+    margin: 10px 0 2px 34px;
+    border: 1px solid var(--line-strong);
+    background: var(--paper);
+  }
+  .preview-wrap iframe{
+    width: 100%;
+    height: 360px;
+    border: none;
+    display: block;
+  }
+  .preview-unavailable{
+    padding: 1rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .summary-wrap{
+    margin: 10px 0 2px 34px;
+    border: 1px solid var(--line-strong);
+    background: var(--paper);
+    padding: 0.9rem 1rem;
+  }
+  .summary-wrap textarea{
+    width: 100%;
+    min-height: 90px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.87rem;
+    padding: 8px 9px;
+    border: 1px solid var(--line-strong);
+    background: var(--paper-raised);
+    color: var(--ink);
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  .summary-wrap textarea:focus{ outline: none; border-color: var(--brass); }
+  .summary-hint{
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin: 0 0 6px;
+  }
+  .summary-error{
+    font-size: 0.8rem;
+    color: #8C3A2C;
+    margin: 6px 0 0;
+  }
+  .summary-actions{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .summary-actions button{
+    background: var(--ink);
+    color: var(--paper-raised);
+    border: none;
+    padding: 7px 14px;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 0.83rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .summary-actions button:hover{ background: var(--brass-deep); }
+  .summary-actions button:disabled{
+    opacity: 0.55;
+    cursor: default;
+  }
+  .summary-loading{
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  .summary-output{
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line-strong);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--ink);
+    white-space: pre-wrap;
+  }
+  .summary-output .label{
+    font-family: 'Fraunces', serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--brass-deep);
+  }
+
+  .check{
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    border: 1px solid var(--line-strong);
+    background: var(--paper-raised);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .check.checked{
+    background: var(--done-bg);
+    border-color: var(--done-ink);
+  }
+  .check.checked::after{
+    content: "";
+    width: 8px;
+    height: 4px;
+    border-left: 2px solid var(--done-ink);
+    border-bottom: 2px solid var(--done-ink);
+    transform: rotate(-45deg) translateY(-1px);
+  }
+
+  .slide-main a{
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.97rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .slide-main a:hover{ border-bottom-color: var(--brass); }
+  .slide-row.done .slide-main a{ text-decoration: line-through; text-decoration-color: var(--ink-soft); }
+
+  .slide-main .notes{
+    font-size: 0.83rem;
+    color: var(--ink-soft);
+    margin-top: 3px;
+  }
+
+  .slide-main .no-link{
+    font-weight: 500;
+    font-size: 0.97rem;
+  }
+
+  .slide-actions{
+    display: flex;
+    gap: 6px;
+    align-self: center;
+  }
+
+  button.icon-btn{
+    background: none;
+    border: 1px solid transparent;
+    color: var(--ink-soft);
+    font-size: 0.78rem;
+    cursor: pointer;
+    padding: 3px 7px;
+    font-family: 'Work Sans', sans-serif;
+  }
+  button.icon-btn:hover{
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+
+  .empty{
+    padding: 2.2rem 0.5rem;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    border-top: 1px solid var(--line);
+    margin-bottom: 1.3rem;
+  }
+  .empty .big{
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  form.add-form{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--line-strong);
+  }
+
+  .status{
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    padding: 2rem 0;
+    text-align: center;
+  }
+
+  @media (max-width: 680px){
+    .layout{ grid-template-columns: 1fr; }
+    nav.tabs{
+      flex-direction: row;
+      overflow-x: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .tab{
+      border-bottom: none;
+      border-right: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    .tab.active::before{
+      left: 0; right: 0; top: auto; bottom: 0;
+      width: auto; height: 3px;
+    }
+    main.panel{ padding: 1.4rem 1.1rem 1.6rem; }
+    .subject-head{ flex-direction: column; }
+    .progress-wrap{ text-align: left; }
+    .progress-track{ width: 100%; }
+
+    header.top h1{ font-size: 1.5rem; }
+    header.top{ flex-direction: column; align-items: flex-start; gap: 4px; }
+
+    .slide-row-top{
+      grid-template-columns: 20px 1fr;
+      row-gap: 8px;
+    }
+    .slide-actions{
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      margin-left: 30px;
+    }
+    .preview-wrap, .summary-wrap{
+      margin-left: 0;
+    }
+    .preview-wrap iframe{ height: 280px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top">
+    <h1>Study index</h1>
+    <div class="tally" id="tally"></div>
+  </header>
+
+  <div class="layout">
+    <nav class="tabs" id="tabs"></nav>
+    <main class="panel" id="panel">
+      <div class="status">Loading your subjects…</div>
+    </main>
+  </div>
+</div>
+
+<script>
+const COLORS = [
+  { key: 'c1', fg: 'var(--c1)', bg: 'var(--c1-bg)' },
+  { key: 'c2', fg: 'var(--c2)', bg: 'var(--c2-bg)' },
+  { key: 'c3', fg: 'var(--c3)', bg: 'var(--c3-bg)' },
+  { key: 'c4', fg: 'var(--c4)', bg: 'var(--c4-bg)' },
+  { key: 'c5', fg: 'var(--c5)', bg: 'var(--c5-bg)' },
+  { key: 'c6', fg: 'var(--c6)', bg: 'var(--c6-bg)' },
+];
+
+function uid(){ return Math.random().toString(36).slice(2, 10); }
+
+const DEFAULT_NAMES = [
+  'Intro to Mass Comm',
+  'Graphic Comm',
+  'English for Academic Purposes',
+  'Comm Theory and Practice',
+  'Writing for Mass Media'
+];
+
+const SEED_SLIDES = {
+  0: [
+    { title: 'Topic 01_Intro to Communication', url: 'https://drive.google.com/file/d/19zNlbstAOAdJhCorSkNrBkWxzI_hlkUS/view?usp=sharing' },
+    { title: 'Topic 02_Intro to Mass Communication', url: 'https://drive.google.com/file/d/176rf44yJWGX12MMOltD1Sll47cVBaXe2/view?usp=sharing' },
+    { title: 'Additional (Mass Communication & Mass Media)', url: 'https://drive.google.com/file/d/1V606slMkvqQnHeuIwEGsHUmh2bNHxUPD/view?usp=sharing' },
+    { title: 'Topic 03_Communication Theories', url: 'https://drive.google.com/file/d/1BlruXZ2fuamqUsdr-FLnScBYiAMTUtRS/view?usp=sharing' },
+    { title: 'Topic 04_Psychology and Sociology of Media Consumers', url: 'https://drive.google.com/file/d/14TiXEo8xbcO_gLqB4driqbuC2ykkI1_m/view?usp=sharing' },
+    { title: 'Topic 05_IT and New Era Communication', url: 'https://drive.google.com/file/d/14TiXEo8xbcO_gLqB4driqbuC2ykkI1_m/view?usp=sharing' },
+    { title: 'Topic 06_Print Media', url: 'https://drive.google.com/file/d/18wongox-FIwF2v78gS3i9UHT0-5IDXHN/view?usp=sharing' },
+    { title: 'Topic 07_Electronic Media', url: 'https://drive.google.com/file/d/1UmqS2W8KcH_jZJEedK5S80BS3vzn9z9S/view?usp=sharing' },
+    { title: 'Topic 08_Advertising', url: 'https://drive.google.com/file/d/1BBxAD1mSCFa2otBGGUaZ2f2FBqbhLno4/view?usp=sharing' },
+    { title: 'Topic 09_Mass Media in Transition', url: 'https://drive.google.com/file/d/1Nj_fVjsVqk4tvToy0c1XJ0dOpqx96cQu/view?usp=sharing' },
+    { title: 'Topic 10_Impacts of Media', url: 'https://drive.google.com/file/d/1jWUuRu-QARYfoZ1mYEDX7-9ZStSptIHN/view?usp=sharing' }
+  ],
+  3: [
+    { title: 'Topic 01_Introduction', url: 'https://drive.google.com/file/d/1BqjoZr6Ul9v9XzwfdHo_ftLTStYfvT5D/view?usp=sharing' },
+    { title: 'Topic 02_Theory Development', url: 'https://drive.google.com/file/d/1o3Dte0YRkf69-4jYbW4gJUaapTwMbi2e/view?usp=sharing' },
+    { title: 'Topic 03_Cognition and Intrapersonal Communication', url: 'https://drive.google.com/file/d/1j3dlD55PNDDpA2abaAqiCVbz7kbPU-Kz/view?usp=sharing', notes: 'Attribution Theory (A.T.); Uncertainty Reduction Theory (U.R.T.)' },
+    { title: 'Topic 04_Individual and Social Approaches to Communication', url: 'https://drive.google.com/file/d/1kN7deCCFS6iTomsD-w6KzM-xrAWErywu/view?usp=sharing', notes: 'Social Role Theory of Gender; Emotional Intelligence and Leadership; Message Design Logics (M.D.L.); Interactional Perspectives on Workplace Generations' },
+    { title: 'Topic 05_Interpersonal Communication', url: 'https://drive.google.com/file/d/1aOf7UDBSxZHAwlQN6AZgq1XvP3jp83aE/view?usp=sharing', notes: 'Politeness Theory; Social Exchange Theory (S.E.T.)' },
+    { title: 'Topic 06_Culture', url: 'https://drive.google.com/file/d/1hjJf7liwteINSbE-eJW-PgOilNu0hquD/view?usp=sharing', notes: "Hofstede's Cultural Dimension; Communication Accommodation Theory (C.A.T.)" },
+    { title: 'Topic 07_Persuasion', url: 'https://drive.google.com/file/d/1OE7Gxeu1kGkLqzWJAInnksgeA1X4yrwM/view?usp=sharing', notes: 'Elaboration Likelihood Model (E.L.M.); Theory of Planned Behavior' },
+    { title: 'Topic 08_Group Communication', url: 'https://drive.google.com/file/d/1fAFpm5lpW5CrOocr5pmduIK9y-xKzqO8/view?usp=sharing', notes: 'Functional Group Decision-Making; Groupthink' },
+    { title: 'Topic 09_Mediated Communication', url: 'https://drive.google.com/file/d/1s1h8s7QMBEmjv5lIptgQVtU54C741p2-/view?usp=sharing', notes: 'Diffusions of Innovation Theory; Uses and Gratification Theory (U.G.T.)' },
+    { title: 'Topic 10_Mass Communication', url: 'https://drive.google.com/file/d/1urgYJO8nxvW8pC-nXo7QPUoHOCu4ErKc/view?usp=sharing', notes: 'Agenda-Setting; Cultivation Theory' }
+  ]
+};
+
+function defaultData(){
+  return {
+    activeId: null,
+    subjects: Array.from({length: 5}, (_, i) => ({
+      id: uid(),
+      name: DEFAULT_NAMES[i],
+      color: COLORS[i].key,
+      slides: (SEED_SLIDES[i] || []).map(s => ({
+        id: uid(),
+        title: s.title,
+        url: s.url,
+        notes: s.notes || '',
+        reviewed: false
+      }))
+    }))
+  };
+}
+
+const CLOUD_STORAGE = (typeof window !== 'undefined' && window.storage && typeof window.storage.get === 'function');
+
+async function storageGet(key){
+  if(CLOUD_STORAGE){
+    return await window.storage.get(key, false);
+  }
+  const raw = localStorage.getItem(key);
+  return raw ? { value: raw } : null;
+}
+
+async function storageSet(key, value){
+  if(CLOUD_STORAGE){
+    return await window.storage.set(key, value, false);
+  }
+  localStorage.setItem(key, value);
+  return { value };
+}
+
+let data = null;
+
+async function load(){
+  try{
+    const res = await storageGet('study-data');
+    data = res && res.value ? JSON.parse(res.value) : defaultData();
+  }catch(e){
+    data = defaultData();
+  }
+  if(!data.activeId && data.subjects.length){
+    data.activeId = data.subjects[0].id;
+  }
+  render();
+}
+
+async function save(){
+  try{
+    await storageSet('study-data', JSON.stringify(data));
+  }catch(e){
+    console.error('Could not save', e);
+  }
+}
+
+function colorOf(key){
+  return COLORS.find(c => c.key === key) || COLORS[0];
+}
+
+function normalizeUrl(raw){
+  const trimmed = raw.trim();
+  if(!trimmed) return '';
+  if(/^https?:\/\//i.test(trimmed)) return trimmed;
+  return 'https://' + trimmed;
+}
+
+const expanded = new Set();
+const summaryExpanded = new Set();
+const summarizing = new Set();
+const summaryErrors = new Map();
+
+function embedUrl(url){
+  if(!url) return null;
+  let m = url.match(/docs\.google\.com\/presentation\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://docs.google.com/presentation/d/' + m[1] + '/embed?start=false&loop=false&delayms=3000';
+  m = url.match(/docs\.google\.com\/document\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://docs.google.com/document/d/' + m[1] + '/preview';
+  m = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://drive.google.com/file/d/' + m[1] + '/preview';
+  m = url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://drive.google.com/file/d/' + m[1] + '/preview';
+  if(/\.pdf($|\?)/i.test(url)) return url;
+  if(/onedrive\.live\.com|1drv\.ms|sharepoint\.com/i.test(url)) return url;
+  return 'https://docs.google.com/viewer?embedded=true&url=' + encodeURIComponent(url);
+}
+
+async function summarizeText(sourceText){
+  const prompt = 'Summarize the following study slide content in plain, everyday language. ' +
+    'Do not use technical jargon or unexplained terminology; if a technical term is essential, explain it in simple words right after it. ' +
+    'Write it as short, clear bullet points a student could skim quickly the night before an exam. ' +
+    'Do not add a heading or preamble, just the bullet points.\n\nSlide content:\n' + sourceText;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 700,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if(!response.ok) throw new Error('Request failed');
+  const data = await response.json();
+  return (data.content || [])
+    .map(block => block.type === 'text' ? block.text : '')
+    .join('\n')
+    .trim();
+}
+
+function buildSummaryPanel(sub, slide){
+  const wrap = document.createElement('div');
+  wrap.className = 'summary-wrap';
+
+  const hint = document.createElement('div');
+  hint.className = 'summary-hint';
+  hint.textContent = 'Paste the text or bullet points from this slide, then get a plain-language summary with no jargon.';
+  wrap.appendChild(hint);
+
+  const textarea = document.createElement('textarea');
+  textarea.placeholder = 'Paste slide text here...';
+  textarea.value = slide.sourceText || '';
+  wrap.appendChild(textarea);
+
+  const actionsRow = document.createElement('div');
+  actionsRow.className = 'summary-actions';
+
+  const genBtn = document.createElement('button');
+  const isBusy = summarizing.has(slide.id);
+  genBtn.type = 'button';
+  genBtn.textContent = isBusy ? 'Summarizing…' : (slide.summary ? 'Re-summarize' : 'Summarize');
+  genBtn.disabled = isBusy;
+  actionsRow.appendChild(genBtn);
+
+  if(isBusy){
+    const loading = document.createElement('span');
+    loading.className = 'summary-loading';
+    loading.textContent = 'Reading through it now';
+    actionsRow.appendChild(loading);
+  }
+  wrap.appendChild(actionsRow);
+
+  const errorSlot = document.createElement('div');
+  if(summaryErrors.has(slide.id)){
+    const err = document.createElement('div');
+    err.className = 'summary-error';
+    err.textContent = summaryErrors.get(slide.id);
+    errorSlot.appendChild(err);
+  }
+  wrap.appendChild(errorSlot);
+
+  if(slide.summary){
+    const out = document.createElement('div');
+    out.className = 'summary-output';
+    const label = document.createElement('div');
+    label.className = 'label';
+    label.textContent = 'In plain language';
+    out.appendChild(label);
+    const body = document.createElement('div');
+    body.textContent = slide.summary;
+    out.appendChild(body);
+    wrap.appendChild(out);
+  }
+
+  genBtn.addEventListener('click', async () => {
+    const text = textarea.value.trim();
+    summaryErrors.delete(slide.id);
+    if(!text){
+      summaryErrors.set(slide.id, 'Paste some slide text first.');
+      render();
+      return;
+    }
+    slide.sourceText = text;
+    summarizing.add(slide.id);
+    save();
+    render();
+    try{
+      const result = await summarizeText(text);
+      slide.summary = result;
+      summaryErrors.delete(slide.id);
+    }catch(e){
+      summaryErrors.set(slide.id, "Couldn't generate a summary just now. Try again.");
+    }finally{
+      summarizing.delete(slide.id);
+      save();
+      render();
+    }
+  });
+
+  return wrap;
+}
+
+function render(){
+  renderTabs();
+  renderPanel();
+  renderTally();
+}
+
+function renderTally(){
+  const total = data.subjects.reduce((s, sub) => s + sub.slides.length, 0);
+  const done = data.subjects.reduce((s, sub) => s + sub.slides.filter(x => x.reviewed).length, 0);
+  const tally = document.getElementById('tally');
+  tally.textContent = total === 0 ? 'No slides added yet' : (done + ' of ' + total + ' reviewed');
+}
+
+function renderTabs(){
+  const nav = document.getElementById('tabs');
+  nav.innerHTML = '';
+  data.subjects.forEach(sub => {
+    const c = colorOf(sub.color);
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (sub.id === data.activeId ? ' active' : '');
+    btn.style.setProperty('--tab-color', c.fg);
+    btn.innerHTML =
+      '<span class="swatch" style="background:' + c.fg + '"></span>' +
+      '<span>' + escapeHtml(sub.name || 'Untitled') + '</span>' +
+      '<span class="count">' + sub.slides.length + '</span>';
+    btn.addEventListener('click', () => { data.activeId = sub.id; render(); });
+    nav.appendChild(btn);
+  });
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function renderPanel(){
+  const panel = document.getElementById('panel');
+  const sub = data.subjects.find(s => s.id === data.activeId);
+  if(!sub){ panel.innerHTML = ''; return; }
+  const c = colorOf(sub.color);
+  const total = sub.slides.length;
+  const done = sub.slides.filter(x => x.reviewed).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  panel.innerHTML = '';
+
+  const head = document.createElement('div');
+  head.className = 'subject-head';
+  head.innerHTML =
+    '<div class="subject-name-wrap">' +
+      '<span class="swatch-lg" style="background:' + c.fg + '"></span>' +
+      '<span class="subject-name">' + escapeHtml(sub.name) + '</span>' +
+    '</div>' +
+    '<div class="progress-wrap">' +
+      '<div class="progress-label">' + (total ? (done + ' / ' + total + ' reviewed') : 'nothing added yet') + '</div>' +
+      '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%; background:' + c.fg + '"></div></div>' +
+    '</div>';
+  panel.appendChild(head);
+
+  if(total === 0){
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.innerHTML = '<div class="big">No content for now</div>Slides for this subject will be added soon.';
+    panel.appendChild(empty);
+  } else {
+    const list = document.createElement('ul');
+    list.className = 'slides';
+    sub.slides.forEach(slide => {
+      const li = document.createElement('li');
+      li.className = 'slide-row' + (slide.reviewed ? ' done' : '');
+
+      const top = document.createElement('div');
+      top.className = 'slide-row-top';
+
+      const check = document.createElement('button');
+      check.className = 'check' + (slide.reviewed ? ' checked' : '');
+      check.setAttribute('aria-label', slide.reviewed ? 'Mark as not reviewed' : 'Mark as reviewed');
+      check.addEventListener('click', () => {
+        slide.reviewed = !slide.reviewed;
+        save();
+        render();
+      });
+      top.appendChild(check);
+
+      const mainDiv = document.createElement('div');
+      mainDiv.className = 'slide-main';
+      if(slide.url){
+        const a = document.createElement('a');
+        a.href = slide.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = slide.title;
+        mainDiv.appendChild(a);
+      } else {
+        const span = document.createElement('span');
+        span.className = 'no-link';
+        span.textContent = slide.title;
+        mainDiv.appendChild(span);
+      }
+      if(slide.notes){
+        const notes = document.createElement('div');
+        notes.className = 'notes';
+        notes.textContent = slide.notes;
+        mainDiv.appendChild(notes);
+      }
+      top.appendChild(mainDiv);
+
+      const spacer = document.createElement('div');
+      top.appendChild(spacer);
+
+      const actions = document.createElement('div');
+      actions.className = 'slide-actions';
+
+      if(slide.url){
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'icon-btn';
+        viewBtn.textContent = expanded.has(slide.id) ? 'Hide' : 'Preview';
+        viewBtn.addEventListener('click', () => {
+          if(expanded.has(slide.id)) expanded.delete(slide.id);
+          else expanded.add(slide.id);
+          render();
+        });
+        actions.appendChild(viewBtn);
+      }
+
+      const summBtn = document.createElement('button');
+      summBtn.className = 'icon-btn';
+      summBtn.textContent = summaryExpanded.has(slide.id) ? 'Hide summary' : (slide.summary ? 'Summary' : 'Summarize');
+      summBtn.addEventListener('click', () => {
+        if(summaryExpanded.has(slide.id)) summaryExpanded.delete(slide.id);
+        else summaryExpanded.add(slide.id);
+        render();
+      });
+      actions.appendChild(summBtn);
+
+      top.appendChild(actions);
+
+      li.appendChild(top);
+
+      if(expanded.has(slide.id) && slide.url){
+        const wrap = document.createElement('div');
+        wrap.className = 'preview-wrap';
+        const src = embedUrl(slide.url);
+        const iframe = document.createElement('iframe');
+        iframe.src = src;
+        iframe.setAttribute('allow', 'fullscreen');
+        iframe.setAttribute('loading', 'lazy');
+        wrap.appendChild(iframe);
+        li.appendChild(wrap);
+      }
+
+      if(summaryExpanded.has(slide.id)){
+        li.appendChild(buildSummaryPanel(sub, slide));
+      }
+
+      list.appendChild(li);
+    });
+    panel.appendChild(list);
+  }
+
+}
+
+load();
+</script>
+
+</body>
+</html>
